@@ -9,6 +9,7 @@ func main() {
 	var conferenceName string = "Go Conference"
 	const conferenceTickets int = 50
 	var remainingTickets uint = 50
+	var bookings []string
 
 	fmt.Printf("Welcome to our %v booking application!\n", conferenceName)
 	fmt.Printf("We have total of %v tickets and %v are still available\n", conferenceTickets, remainingTickets)
@@ -32,9 +33,14 @@ func main() {
 	fmt.Println("Enter the number of tickets you want to book: ")
 	fmt.Scan(&userTickets)
 
-	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
-
 	//calculate the ramining tickets after user booked their ticket
 	remainingTickets = remainingTickets - userTickets
+
+	//store users booking records
+	bookings = append(bookings, firstName+" "+lastName)
+
+	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
 	fmt.Printf("%v tickets remaing for %v", remainingTickets, conferenceName)
+
+	fmt.Printf("This is all our bookings in the application: %v\n", bookings)
 }
