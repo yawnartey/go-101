@@ -36,7 +36,12 @@ func main() {
 		fmt.Println("Enter the number of tickets you want to book: ")
 		fmt.Scan(&userTickets)
 
-		if userTickets <= remainingTickets {
+		//validate the credentials that the user provided
+		var isValidName = len(firstName) >= 2 && len(lastName) >= 2
+		var isValidEmail = strings.Contains(emailAddress, "@")
+		var isValidTicketNumber = userTickets > 0 && userTickets <= remainingTickets
+
+		if isValidName && isValidEmail && isValidTicketNumber {
 			remainingTickets = remainingTickets - userTickets
 			//store users booking records
 			bookings = append(bookings, firstName+" "+lastName)
@@ -58,7 +63,16 @@ func main() {
 				break
 			}
 		} else {
-			fmt.Printf("We only have %v tickets remaining. You can't book %v tickets. Enter a valid ticket number less or equal to %v\n", remainingTickets, userTickets, remainingTickets)
+			if !isValidName {
+				fmt.Println("First name or Last name you entered is too short")
+			}
+			if !isValidEmail {
+				fmt.Println("The email address you entered is incorrect")
+			}
+			if !isValidTicketNumber {
+				fmt.Println("The ticket number you entered is incorrect")
+			}
+
 		}
 
 	}
