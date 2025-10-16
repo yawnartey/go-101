@@ -15,35 +15,15 @@ func main() {
 	greetUsers(conferenceName, conferenceTickets, remainingTickets)
 
 	for {
-
-		var firstName string
-		var lastName string
-		var emailAddress string
-		var userTickets uint
-
-		//ask the user for their booking details
-		fmt.Println("Enter your first name: ")
-		fmt.Scan(&firstName)
-
-		fmt.Println("Enter your last name: ")
-		fmt.Scan(&lastName)
-
-		fmt.Println("Enter your email address: ")
-		fmt.Scan(&emailAddress)
-
-		fmt.Println("Enter the number of tickets you want to book: ")
-		fmt.Scan(&userTickets)
+		//get user input
+		firstName, lastName, emailAddress, userTickets := getUserInput()
 
 		//validate the credentials that the user provided using the validateUserInput function
-		validateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicketNumber {
-			remainingTickets = remainingTickets - userTickets
-			//store users booking records
-			bookings = append(bookings, firstName+" "+lastName)
-
-			fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
-			fmt.Printf("%v tickets remaing for %v\n", remainingTickets, conferenceName)
+			//booking the ticket
+			bookTicket(remainingTickets, userTickets, bookings, firstName, lastName, emailAddress, conferenceName)
 
 			//retrieve only the first name of the user bookings and print it to the user using the fucntion getFirstNames
 			var firstNames = getFirstNames(bookings)
@@ -86,8 +66,42 @@ func getFirstNames(bookings []string) []string {
 	return firstNames
 }
 
-func validateUserInput(firstName string, lastName string, emailAddress string, userTickets uint, remainingTickets uint) {
+func validateUserInput(firstName string, lastName string, emailAddress string, userTickets uint, remainingTickets uint) (bool, bool, bool) {
 	var isValidName = len(firstName) >= 2 && len(lastName) >= 2
 	var isValidEmail = strings.Contains(emailAddress, "@")
 	var isValidTicketNumber = userTickets > 0 && userTickets <= remainingTickets
+
+	return isValidName, isValidEmail, isValidTicketNumber
+}
+
+func getUserInput() (string, string, string, uint) {
+
+	var firstName string
+	var lastName string
+	var emailAddress string
+	var userTickets uint
+
+	//ask the user for their booking details
+	fmt.Println("Enter your first name: ")
+	fmt.Scan(&firstName)
+
+	fmt.Println("Enter your last name: ")
+	fmt.Scan(&lastName)
+
+	fmt.Println("Enter your email address: ")
+	fmt.Scan(&emailAddress)
+
+	fmt.Println("Enter the number of tickets you want to book: ")
+	fmt.Scan(&userTickets)
+
+	return firstName, lastName, emailAddress, userTickets
+}
+
+func bookTicket(remainingTickets uint, userTickets uint, bookings []string, firstName string, lastName string, emailAddress string, conferenceName string) {
+	remainingTickets = remainingTickets - userTickets
+	bookings = append(bookings, firstName+" "+lastName)
+
+	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
+	fmt.Printf("%v tickets remaing for %v\n", remainingTickets, conferenceName)
+
 }
