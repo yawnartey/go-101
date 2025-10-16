@@ -3,6 +3,7 @@ package main
 import (
 	"booking-app/helper"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -19,45 +20,53 @@ type UserData struct {
 	numberOfTickets uint
 }
 
+//let main function wait to send ticket details before continuing or breaking other tasks
+
+var wg = sync.WaitGroup{}
+
 func main() {
 
 	greetUsers()
 
-	for {
-		//get user input
-		firstName, lastName, emailAddress, userTickets := getUserInput()
+	// for {
+	//get user input
+	firstName, lastName, emailAddress, userTickets := getUserInput()
 
-		//validate the credentials that the user provided using the validateUserInput function
-		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
+	//validate the credentials that the user provided using the validateUserInput function
+	isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
 
-		if isValidName && isValidEmail && isValidTicketNumber {
-			//booking the ticket
-			bookTicket(userTickets, firstName, lastName, emailAddress)
-			go sendTicket(userTickets, firstName, lastName, emailAddress)
+	if isValidName && isValidEmail && isValidTicketNumber {
+		//booking the ticket
+		bookTicket(userTickets, firstName, lastName, emailAddress)
 
-			//retrieve only the first name of the user bookings and print it to the user using the fucntion getFirstNames
-			var firstNames = getFirstNames()
-			fmt.Printf("The first names of bookings are: %v\n", firstNames)
+		wg.Add(1)
+		go sendTicket(userTickets, firstName, lastName, emailAddress)
 
-			//end the program if the remaining tickets is 0
-			if remainingTickets == 0 {
-				fmt.Println("Our Conference is fully booked. Come back next year")
-				break
-			}
-		} else {
-			if !isValidName {
-				fmt.Println("First name or Last name you entered is too short")
-			}
-			if !isValidEmail {
-				fmt.Println("The email address you entered is incorrect")
-			}
-			if !isValidTicketNumber {
-				fmt.Println("The ticket number you entered is incorrect")
-			}
+		//retrieve only the first name of the user bookings and print it to the user using the fucntion getFirstNames
+		var firstNames = getFirstNames()
+		fmt.Printf("The first names of bookings are: %v\n", firstNames)
 
+		//end the program if the remaining tickets is 0
+		if remainingTickets == 0 {
+			fmt.Println("Our Conference is fully booked. Come back next year")
+			// break
+		}
+	} else {
+		if !isValidName {
+			fmt.Println("First name or Last name you entered is too short")
+		}
+		if !isValidEmail {
+			fmt.Println("The email address you entered is incorrect")
+		}
+		if !isValidTicketNumber {
+			fmt.Println("The ticket number you entered is incorrect")
 		}
 
 	}
+
+	// }
+
+	wg.Wait()
 
 }
 
