@@ -1,32 +1,42 @@
 package main
 
 import (
+	"booking-app/helper"
 	"fmt"
-	"strings"
+	"time"
 )
+
+const conferenceTickets int = 50
+
+var conferenceName string = "Go Conference"
+var remainingTickets uint = 50
+var bookings = make([]UserData, 0)
+
+type UserData struct {
+	firstName       string
+	lastName        string
+	emailAddress    string
+	numberOfTickets uint
+}
 
 func main() {
 
-	var conferenceName string = "Go Conference"
-	const conferenceTickets int = 50
-	var remainingTickets uint = 50
-	var bookings []string
-
-	greetUsers(conferenceName, conferenceTickets, remainingTickets)
+	greetUsers()
 
 	for {
 		//get user input
 		firstName, lastName, emailAddress, userTickets := getUserInput()
 
 		//validate the credentials that the user provided using the validateUserInput function
-		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, emailAddress, userTickets, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicketNumber {
 			//booking the ticket
-			bookTicket(remainingTickets, userTickets, bookings, firstName, lastName, emailAddress, conferenceName)
+			bookTicket(userTickets, firstName, lastName, emailAddress)
+			go sendTicket(userTickets, firstName, lastName, emailAddress)
 
 			//retrieve only the first name of the user bookings and print it to the user using the fucntion getFirstNames
-			var firstNames = getFirstNames(bookings)
+			var firstNames = getFirstNames()
 			fmt.Printf("The first names of bookings are: %v\n", firstNames)
 
 			//end the program if the remaining tickets is 0
@@ -51,27 +61,18 @@ func main() {
 
 }
 
-func greetUsers(confName string, confTickets int, confRemainTickets uint) {
-	fmt.Printf("Welcome to our %v booking application!\n", confName)
-	fmt.Printf("We have total of %v tickets and %v are still available\n", confTickets, confRemainTickets)
+func greetUsers() {
+	fmt.Printf("Welcome to our %v booking application!\n", conferenceName)
+	fmt.Printf("We have total of %v tickets and %v are still available\n", conferenceTickets, remainingTickets)
 	fmt.Printf("Get your tickets here to attend\n")
 }
 
-func getFirstNames(bookings []string) []string {
+func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking.firstName)
 	}
 	return firstNames
-}
-
-func validateUserInput(firstName string, lastName string, emailAddress string, userTickets uint, remainingTickets uint) (bool, bool, bool) {
-	var isValidName = len(firstName) >= 2 && len(lastName) >= 2
-	var isValidEmail = strings.Contains(emailAddress, "@")
-	var isValidTicketNumber = userTickets > 0 && userTickets <= remainingTickets
-
-	return isValidName, isValidEmail, isValidTicketNumber
 }
 
 func getUserInput() (string, string, string, uint) {
@@ -97,11 +98,29 @@ func getUserInput() (string, string, string, uint) {
 	return firstName, lastName, emailAddress, userTickets
 }
 
-func bookTicket(remainingTickets uint, userTickets uint, bookings []string, firstName string, lastName string, emailAddress string, conferenceName string) {
+func bookTicket(userTickets uint, firstName string, lastName string, emailAddress string) {
 	remainingTickets = remainingTickets - userTickets
-	bookings = append(bookings, firstName+" "+lastName)
+
+	//create a map for a user
+	var userData = UserData{
+		firstName:       firstName,
+		lastName:        lastName,
+		emailAddress:    emailAddress,
+		numberOfTickets: userTickets,
+	}
+
+	bookings = append(bookings, userData)
+	fmt.Printf("List of bookings is %v\n", bookings)
 
 	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
 	fmt.Printf("%v tickets remaing for %v\n", remainingTickets, conferenceName)
 
+}
+
+func sendTicket(userTickets uint, firstName string, lastName string, emailAddress string) {
+	time.Sleep(10 * time.Second)
+	var ticket = fmt.Sprintf("%v tickets for %v %v", userTickets, firstName, lastName)
+	fmt.Println("##########")
+	fmt.Printf("Sending tickets: \n %v \n to email address %v \n", ticket, emailAddress)
+	fmt.Println("##########")
 }
