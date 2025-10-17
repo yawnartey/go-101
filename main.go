@@ -43,8 +43,8 @@ func main() {
 		go sendTicket(userTickets, firstName, lastName, emailAddress)
 
 		//retrieve only the first name of the user bookings and print it to the user using the fucntion getFirstNames
-		var firstNames = getFirstNames()
-		fmt.Printf("The first names of bookings are: %v\n", firstNames)
+		// var firstNames = getFirstNames()
+		// fmt.Printf("The first names of bookings are: %v\n", firstNames)
 
 		//end the program if the remaining tickets is 0
 		if remainingTickets == 0 {
@@ -119,10 +119,10 @@ func bookTicket(userTickets uint, firstName string, lastName string, emailAddres
 	}
 
 	bookings = append(bookings, userData)
-	fmt.Printf("List of bookings is %v\n", bookings)
+	// fmt.Printf("List of bookings is %v\n", bookings)
 
 	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, emailAddress)
-	fmt.Printf("%v tickets remaing for %v\n", remainingTickets, conferenceName)
+	// fmt.Printf("%v tickets remaing for %v\n", remainingTickets, conferenceName)
 
 }
 
@@ -132,4 +132,5 @@ func sendTicket(userTickets uint, firstName string, lastName string, emailAddres
 	fmt.Println("##########")
 	fmt.Printf("Sending tickets: \n %v \n to email address %v \n", ticket, emailAddress)
 	fmt.Println("##########")
+	wg.Done()
 }
